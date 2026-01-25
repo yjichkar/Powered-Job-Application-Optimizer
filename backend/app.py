@@ -123,7 +123,6 @@ def generate_ai_response(prompt, fallback_text="AI response unavailable"):
     """Generate AI response with token-optimized config"""
     try:
         config = {
-            "response_mime_type": "application/json",
             "temperature": 0.3,  # Lower = more deterministic, fewer tokens
             "max_output_tokens": 1500  # Limit output size
         }
@@ -354,17 +353,24 @@ CV optimization JSON:{{"summary_suggestion":"2-3 sentences","experience_improvem
 
 @app.route('/api/linkedin-people', methods=['POST'])
 def linkedin_people():
-    """LinkedIn finder - token optimized"""
+    """LinkedIn finder - simplified for HR and recruiter searches"""
     print("➡️ Processing LinkedIn People Finder...")
     try:
         data = request.json
         jd = data.get('jd', '')
         
-        prompt = f"""JD:{jd[:1000]}
-LinkedIn networking JSON:{{"company_name":"str","roles_to_find":[max4],"search_queries":[max3],"connection_message_templates":[max2],"engagement_tips":[max3],"networking_strategy":"1-2 sentences"}}"""
+        prompt = f"""Extract the company name from this job description and generate simple LinkedIn search terms to find HR professionals and recruiters at that company.
+
+JD: {jd[:1500]}
+
+Return JSON with:
+- company_name: Company hiring (string, extract from JD)
+- simple_searches: Array of 3 simple search strings to find recruiters/HR (e.g., ["Google Recruiter", "Google HR", "Google Talent Acquisition"])
+
+Format: {{"company_name":"str","simple_searches":["str","str","str"]}}"""
         
         result = generate_ai_response(prompt)
-        print("✅ LinkedIn People completed")
+        print(f"✅ LinkedIn People completed: {result.get('company_name', 'N/A')}")
         return jsonify(result), 200
     except Exception as e:
         print(f"❌ LinkedIn People Error: {e}")

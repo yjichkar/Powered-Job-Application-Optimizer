@@ -4,8 +4,10 @@ import {
   Upload, Link as LinkIcon, ArrowRight, ChevronLeft,
   ScanLine, Percent, BarChart3, FileText, Mail,
   Users, Zap, MessageSquare, CheckCircle2, AlertTriangle,
-  Sparkles, X, LogOut, Shield, Loader2, ExternalLink
+  Sparkles, X, LogOut, Shield, Loader2, ExternalLink,
+  QrCode, TrendingUp, Send
 } from 'lucide-react';
+import { PrismFluxLoader } from './components/ui/PrismFluxLoader';
 
 // Firebase imports
 import { initializeApp } from 'firebase/app';
@@ -38,155 +40,94 @@ function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-// Theme Configuration
-const THEME = {
-  colors: {
-    bg: '#0a0a0a',
-    surface: '#121212',
-    surfaceHighlight: '#1E1E1E',
-    text: '#EDEDED',
-    muted: '#888888',
-    accent: '#CCFF00',
-    accentDim: 'rgba(204, 255, 0, 0.1)',
-    border: '#333333',
-    error: '#FF3333'
-  }
-};
-
 // Services Configuration with API endpoints
 const SERVICES = [
   {
     id: 'ats-scanner',
     title: 'ATS Scanner',
-    desc: 'Ensure your resume passes through Applicant Tracking Systems.',
-    icon: ScanLine,
-    fullDesc: 'Our advanced parsing engine simulates top-tier ATS algorithms to highlight formatting errors.',
+    desc: 'Ensure your resume passes through applicant tracking systems.',
+    icon: QrCode,
+    actionText: 'Scan Resume',
+    fullDesc: 'Our advanced parsing engine simulates top-tier ATS algorithms.',
     endpoint: '/ats-scanner',
-    features: ['Keyword optimization analysis', 'Format compatibility check', 'Section structure validation', 'Scoring against ATS algorithms']
+    features: ['Keyword optimization', 'Format check', 'Structure validation', 'ATS scoring']
   },
   {
     id: 'job-suitability',
-    title: 'Job Suitability %',
-    desc: 'Get a percentage match for your profile against job description.',
+    title: 'Job Match',
+    desc: 'Calculate your match percentage for any role.',
     icon: Percent,
-    fullDesc: 'Get an AI-powered compatibility score that measures how well your experience aligns with job requirements.',
+    actionText: 'Calculate',
+    fullDesc: 'AI-powered compatibility scoring across 40+ relevance points.',
     endpoint: '/job-suitability',
-    features: ['Skills matching analysis', 'Experience level comparison', 'Qualification alignment', 'Real-time percentage score']
+    features: ['Skills matching', 'Experience comparison', 'Qualification alignment', 'Match score']
   },
   {
     id: 'skill-gap',
-    title: 'Skill Gap Analysis',
-    desc: 'Identify the key skills you are missing for your target role.',
-    icon: BarChart3,
-    fullDesc: 'Discover exactly which skills you need to develop. Get personalized learning path recommendations.',
+    title: 'Skill Gap',
+    desc: 'Identify missing skills for your target role.',
+    icon: TrendingUp,
+    actionText: 'Analyze',
+    fullDesc: 'Discover skills to develop with personalized recommendations.',
     endpoint: '/skill-gap',
-    features: ['Missing skills identification', 'Priority ranking of gaps', 'Learning path suggestions', 'Certification recommendations']
+    features: ['Skill identification', 'Priority ranking', 'Learning paths', 'Certifications']
   },
   {
     id: 'interview-prep',
     title: 'Interview Prep',
-    desc: 'Get AI-powered interview questions and answers for your target role.',
+    desc: 'Practice with AI-generated interview questions.',
     icon: MessageSquare,
-    fullDesc: 'Prepare for your interview with AI-generated questions specific to the job description and company.',
+    actionText: 'Practice',
+    fullDesc: 'Neural-network-driven mock interviews for your target role.',
     endpoint: '/interview-prep',
-    features: ['Role-specific questions', 'Behavioral question practice', 'Technical question prep', 'STAR method guidance']
+    features: ['Role-specific Q&A', 'Behavioral prep', 'Technical prep', 'STAR method']
   },
   {
     id: 'cv-builder',
     title: 'CV Builder',
-    desc: 'Create a tailored, professional resume to impress.',
+    desc: 'Generate an optimized resume for your target role.',
     icon: FileText,
-    fullDesc: 'Build a stunning, ATS-optimized resume tailored specifically for your target role.',
+    actionText: 'Build CV',
+    fullDesc: 'Impact-focused templates for both AI scanners and humans.',
     endpoint: '/cv-builder',
-    features: ['ATS-friendly templates', 'Keyword optimization', 'Achievement highlighting', 'Professional formatting']
+    features: ['ATS templates', 'Keyword optimization', 'Achievements', 'Formatting']
   },
   {
     id: 'cold-email',
-    title: 'Cold Email Generator',
-    desc: 'Craft compelling outreach emails to recruiters.',
+    title: 'Cold Email',
+    desc: 'Generate personalized outreach that gets responses.',
     icon: Mail,
-    fullDesc: 'Generate personalized cold emails that grab attention and get responses from recruiters.',
+    actionText: 'Generate',
+    fullDesc: 'Hyper-personalized communication protocols.',
     endpoint: '/cold-email',
-    features: ['Personalized templates', 'Subject line optimization', 'Follow-up sequences', 'LinkedIn message variants']
+    features: ['Templates', 'Subject lines', 'Follow-ups', 'LinkedIn messages']
   },
   {
     id: 'linkedin-people',
-    title: 'LinkedIn People',
-    desc: 'Find key contacts at your target company on LinkedIn.',
+    title: 'Network Map',
+    desc: 'Find key decision-makers at target companies.',
     icon: Users,
-    fullDesc: 'Identify the right people to connect with at your target company for networking.',
+    actionText: 'Find People',
+    fullDesc: 'Identify the right people to connect with for networking.',
     endpoint: '/linkedin-people',
-    features: ['Decision maker identification', 'Recruiter finder', 'Team member discovery', 'Connection strategy tips']
+    features: ['Decision makers', 'Recruiters', 'Team discovery', 'Strategy tips']
   },
   {
     id: 'callback-prob',
-    title: 'Callback Probability',
-    desc: 'Estimate your chances of getting a callback for the role.',
+    title: 'Response Rate',
+    desc: 'Estimate your callback probability.',
     icon: Zap,
-    fullDesc: 'Get a realistic assessment of your chances based on profile match and market conditions.',
+    actionText: 'Calculate',
+    fullDesc: 'Real-time estimation based on market trends.',
     endpoint: '/callback-probability',
-    features: ['Success probability score', 'Factor breakdown analysis', 'Improvement suggestions', 'Market competitiveness']
+    features: ['Probability score', 'Factor analysis', 'Suggestions', 'Competition']
   }
 ];
 
 // ===== UI COMPONENTS =====
 
-const NoiseBackground = () => (
-  <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] mix-blend-overlay"
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-    }}
-  />
-);
-
-const GridOverlay = () => (
-  <div className="fixed inset-0 pointer-events-none z-0"
-    style={{
-      backgroundImage: `linear-gradient(${THEME.colors.surfaceHighlight} 1px, transparent 1px), linear-gradient(90deg, ${THEME.colors.surfaceHighlight} 1px, transparent 1px)`,
-      backgroundSize: '80px 80px',
-      opacity: 0.3
-    }}
-  />
-);
-
-const Navbar = ({ onLogout, userEmail, onLogoClick }) => (
-  <motion.nav
-    initial={{ y: -20, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center backdrop-blur-sm bg-black/50"
-  >
-    <div
-      className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-      onClick={onLogoClick}
-    >
-      <div className="w-3 h-3 bg-[#CCFF00] rounded-sm" />
-      <span className="font-['Syne'] font-bold text-lg tracking-tight text-white">JOB.OPT</span>
-    </div>
-    <div className="flex items-center gap-6">
-      <a href="#services" className="text-gray-400 hover:text-white transition-colors font-['JetBrains_Mono'] text-xs uppercase tracking-wider">Services</a>
-      <a href="#" className="text-gray-400 hover:text-white transition-colors font-['JetBrains_Mono'] text-xs uppercase tracking-wider">Manifesto</a>
-      <button
-        onClick={onLogout}
-        className="text-white border border-[#333] px-4 py-1 rounded-full hover:bg-white hover:text-black transition-all duration-300 font-['JetBrains_Mono'] text-xs"
-      >
-        SIGN IN
-      </button>
-    </div>
-  </motion.nav>
-);
-
 const LoadingSpinner = ({ text = "Processing..." }) => (
-  <div className="flex flex-col items-center justify-center p-8">
-    <div className="relative">
-      <div className="w-12 h-12 border-2 border-[#CCFF00] rounded-full animate-spin border-t-transparent"></div>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Sparkles size={16} className="text-[#CCFF00] animate-pulse" />
-      </div>
-    </div>
-    <p className="mt-4 font-['JetBrains_Mono'] text-[#CCFF00] animate-pulse text-xs tracking-widest uppercase">
-      {text}
-    </p>
-  </div>
+  <PrismFluxLoader size={40} speed={5} />
 );
 
 // ===== LANDING PAGE COMPONENT =====
@@ -194,21 +135,19 @@ const LoadingSpinner = ({ text = "Processing..." }) => (
 const AnimatedWaveBackground = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Animated Wave Lines */}
       <svg
-        className="absolute bottom-0 left-0 w-full h-full"
-        viewBox="0 0 1440 900"
+        className="absolute w-full h-full"
+        viewBox="0 0 1400 800"
         preserveAspectRatio="xMidYMid slice"
       >
         <defs>
           <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#CCFF00" stopOpacity="0.8" />
+            <stop offset="0%" stopColor="#D4FF00" stopOpacity="0.8" />
             <stop offset="50%" stopColor="#b8e600" stopOpacity="0.6" />
             <stop offset="100%" stopColor="#99cc00" stopOpacity="0.4" />
           </linearGradient>
         </defs>
 
-        {/* Generate multiple wave lines */}
         {Array.from({ length: 20 }).map((_, i) => (
           <motion.path
             key={i}
@@ -241,11 +180,10 @@ const AnimatedWaveBackground = () => {
         ))}
       </svg>
 
-      {/* Glowing orb effect */}
       <motion.div
         className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full"
         style={{
-          background: 'radial-gradient(circle, rgba(204,255,0,0.3) 0%, rgba(204,255,0,0) 70%)',
+          background: 'radial-gradient(circle, rgba(212,255,0,0.3) 0%, rgba(212,255,0,0) 70%)',
         }}
         animate={{
           scale: [1, 1.2, 1],
@@ -271,18 +209,15 @@ const LandingPage = ({ onInitialize }) => {
       exit={{ opacity: 0 }}
       className="min-h-screen bg-[#050505] flex flex-col items-center justify-center relative overflow-hidden"
     >
-      {/* Animated Wave Background */}
       <AnimatedWaveBackground />
 
-      {/* Main Content */}
       <div className="relative z-10 text-center px-4">
-        {/* Hero Text */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
-          <h1 className="font-['Syne'] text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-[0.9]">
+          <h1 className="font-['Inter'] text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9]">
             <motion.span
               className="block text-transparent bg-clip-text"
               style={{
@@ -322,7 +257,6 @@ const LandingPage = ({ onInitialize }) => {
           </h1>
         </motion.div>
 
-        {/* Initialize Button */}
         <motion.button
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -334,18 +268,17 @@ const LandingPage = ({ onInitialize }) => {
         >
           <motion.div
             className="relative px-8 py-4 border border-[#333] rounded-full overflow-hidden"
-            whileHover={{ borderColor: '#CCFF00' }}
+            whileHover={{ borderColor: '#D4FF00' }}
             transition={{ duration: 0.3 }}
           >
-            {/* Button background glow */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-[#CCFF00]/0 via-[#CCFF00]/10 to-[#CCFF00]/0"
+              className="absolute inset-0 bg-gradient-to-r from-[#D4FF00]/0 via-[#D4FF00]/10 to-[#D4FF00]/0"
               initial={{ x: '-100%' }}
               animate={isHovered ? { x: '100%' } : { x: '-100%' }}
               transition={{ duration: 0.6 }}
             />
 
-            <span className="relative flex items-center gap-3 font-['JetBrains_Mono'] text-sm text-gray-300 group-hover:text-[#CCFF00] transition-colors tracking-widest uppercase">
+            <span className="relative flex items-center gap-3 font-['JetBrains_Mono'] text-sm text-gray-300 group-hover:text-[#D4FF00] transition-colors tracking-widest uppercase">
               Initialize System
               <motion.span
                 animate={isHovered ? { x: 5 } : { x: 0 }}
@@ -358,31 +291,99 @@ const LandingPage = ({ onInitialize }) => {
         </motion.button>
       </div>
 
-      {/* Footer branding */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
         className="absolute bottom-8 left-8 flex items-center gap-2"
       >
-        <div className="w-3 h-3 bg-[#CCFF00] rounded-sm" />
-        <span className="font-['Syne'] font-bold text-lg tracking-tight text-white/50">JOB.OPT</span>
+        <div className="w-3 h-3 bg-[#D4FF00] rounded-sm" />
+        <span className="font-['Inter'] font-bold text-lg tracking-tight text-white/50">APPLICATION</span>
       </motion.div>
     </motion.div>
   );
 };
 
+// ===== NAVBAR COMPONENT =====
+
+const Navbar = ({ onLogout, userEmail, onLogoClick }) => (
+  <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-xl">
+    <div className="max-w-[1920px] mx-auto px-12 h-20 flex items-center justify-between">
+      <button onClick={onLogoClick} className="font-['JetBrains_Mono'] font-bold text-2xl tracking-tighter text-white">
+        APP<span className="text-[#D4FF00]">LICATION</span>
+      </button>
+      <div className="hidden md:flex items-center space-x-12 text-xs font-['JetBrains_Mono'] uppercase tracking-widest">
+        <a className="hover:text-[#D4FF00] transition-colors text-slate-400" href="#features">Services</a>
+        <a className="hover:text-[#D4FF00] transition-colors text-slate-400" href="#how-it-works">Methodology</a>
+        <span className="text-slate-500">{userEmail}</span>
+        <button
+          onClick={onLogout}
+          className="px-6 py-2.5 border border-[#D4FF00] text-[#D4FF00] hover:bg-[#D4FF00] hover:text-black transition-all font-bold"
+        >
+          LOGOUT
+        </button>
+      </div>
+    </div>
+  </nav>
+);
+
+// ===== SCROLLING MARQUEE =====
+
+const ScrollingMarquee = () => (
+  <section className="bg-[#c8e600] py-3 overflow-hidden">
+    <style>{`
+      @keyframes marquee-scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .marquee-content {
+        animation: marquee-scroll 50s linear infinite;
+      }
+      .marquee-text {
+        letter-spacing: 0.1em;
+        word-spacing: 0.8em;
+      }
+    `}</style>
+    <div className="flex whitespace-nowrap">
+      <div className="marquee-content text-black/80 font-semibold text-sm tracking-wide uppercase flex items-center">
+        <span className="mx-8 marquee-text">ATS OPTIMIZED</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">DATA DRIVEN</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">AI MATCHING</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">CAREER BOOST</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">ATS OPTIMIZED</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">DATA DRIVEN</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">AI MATCHING</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">CAREER BOOST</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">ATS OPTIMIZED</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">DATA DRIVEN</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">AI MATCHING</span>
+        <span className="w-1.5 h-1.5 bg-black/40 rounded-full flex-shrink-0"></span>
+        <span className="mx-8 marquee-text">CAREER BOOST</span>
+      </div>
+    </div>
+  </section>
+);
+
 // ===== INPUT ZONE COMPONENT =====
 
 const InputZone = ({ jdUrl, setJdUrl, jdText, setJdText, resumeFile, setResumeFile, resumeText, setResumeText, onScrape, isScraping, isScraped }) => {
   const fileInputRef = useRef(null);
-  const [inputMode, setInputMode] = useState('url'); // 'url' or 'text'
+  const [inputMode, setInputMode] = useState('url');
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
       setResumeFile(file);
-      // We'll extract text on the backend
     } else {
       alert('Please upload a PDF file');
     }
@@ -395,134 +396,190 @@ const InputZone = ({ jdUrl, setJdUrl, jdText, setJdText, resumeFile, setResumeFi
   };
 
   return (
-    <section className="w-full max-w-4xl mx-auto mb-16 relative z-10">
-      <div className="text-center mb-12">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="font-['Syne'] text-5xl md:text-7xl font-bold text-white mb-4 tracking-tighter"
-        >
-          OPTIMIZE YOUR <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-[#aaaaaa] to-[#555555]">APPLICATION</span>
-        </motion.h1>
-        <p className="font-['JetBrains_Mono'] text-gray-500 text-sm uppercase tracking-widest px-4">
-          AI-Powered Precision Engineering
-        </p>
-      </div>
+    <section className="relative py-16 md:py-20 overflow-hidden" style={{
+      backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px)',
+      backgroundSize: '50px 50px'
+    }}>
+      {/* Centered Container - 1280px max */}
+      <div className="max-w-[1280px] mx-auto px-6 md:px-8 lg:px-12">
 
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="mx-4 md:mx-0 bg-[#0f0f0f] border border-[#333] p-2 rounded-2xl shadow-2xl"
-      >
-        <div className="flex flex-col gap-4 p-4 md:p-6">
-          {/* Mode Toggle */}
-          <div className="flex items-center gap-2 mb-2">
-            <button
-              onClick={() => setInputMode('url')}
-              className={cn(
-                "px-4 py-2 rounded-lg font-['JetBrains_Mono'] text-xs transition-all",
-                inputMode === 'url'
-                  ? "bg-[#CCFF00] text-black"
-                  : "bg-[#1a1a1a] text-gray-400 hover:text-white"
-              )}
-            >
-              Enter URL
-            </button>
-            <button
-              onClick={() => setInputMode('text')}
-              className={cn(
-                "px-4 py-2 rounded-lg font-['JetBrains_Mono'] text-xs transition-all",
-                inputMode === 'text'
-                  ? "bg-[#CCFF00] text-black"
-                  : "bg-[#1a1a1a] text-gray-400 hover:text-white"
-              )}
-            >
-              Paste Text
-            </button>
+        {/* 2-Column Hero Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-12">
+          {/* Left: Headline (60% width feel) */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight mb-3 font-['Inter'] leading-tight">
+              AI-Powered Career <span className="text-[#D4FF00]">Optimization</span>
+            </h1>
+            <p className="font-['JetBrains_Mono'] text-sm text-slate-400 leading-relaxed max-w-sm">
+              Analyze your CV and job descriptions using ATS-optimized intelligence.
+            </p>
+          </motion.div>
+
+          {/* Right: Preview Card */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="bg-[#0a0a0a] border border-white/10 rounded-xl p-5"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex space-x-1.5">
+                <div className="w-2 h-2 rounded-full bg-red-500/40"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500/40"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500/40"></div>
+              </div>
+              <span className="font-['JetBrains_Mono'] text-[9px] text-slate-600 uppercase">Analysis Preview</span>
+            </div>
+            <div className="h-2.5 bg-[#D4FF00]/15 rounded-full overflow-hidden mb-3">
+              <motion.div className="h-full bg-[#D4FF00] rounded-full" initial={{ width: 0 }} animate={{ width: '82%' }} transition={{ duration: 1.2, ease: "easeOut" }} />
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="bg-black/50 rounded-lg p-2.5 border border-white/5">
+                <p className="text-[9px] font-['JetBrains_Mono'] text-slate-500 mb-0.5">Match</p>
+                <p className="text-lg font-bold text-[#D4FF00]">82%</p>
+              </div>
+              <div className="bg-black/50 rounded-lg p-2.5 border border-white/5">
+                <p className="text-[9px] font-['JetBrains_Mono'] text-slate-500 mb-0.5">ATS</p>
+                <p className="text-lg font-bold text-white">PASS</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="bg-[#0a0a0a] border border-white/10 rounded-xl p-6 md:p-8 shadow-lg"
+        >
+          {/* Workspace Header */}
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+            <div className="w-2 h-2 bg-[#D4FF00] rounded-full"></div>
+            <h2 className="font-['Inter'] text-base font-semibold text-white">Start Your Analysis</h2>
+          </div>
+
+          {/* Step 1: Job Description */}
+          <div className="mb-6">
+            <label className="block font-['JetBrains_Mono'] text-xs uppercase tracking-wider text-slate-500 mb-2">
+              Step 1: Job Description
+            </label>
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => setInputMode('url')}
+                className={cn(
+                  "text-xs font-['JetBrains_Mono'] px-3 py-1.5 rounded-md transition-all duration-200",
+                  inputMode === 'url'
+                    ? "bg-[#D4FF00] text-black font-bold"
+                    : "bg-white/5 text-slate-400 hover:bg-white/10"
+                )}
+              >
+                URL
+              </button>
+              <button
+                onClick={() => setInputMode('text')}
+                className={cn(
+                  "text-xs font-['JetBrains_Mono'] px-3 py-1.5 rounded-md transition-all duration-200",
+                  inputMode === 'text'
+                    ? "bg-[#D4FF00] text-black font-bold"
+                    : "bg-white/5 text-slate-400 hover:bg-white/10"
+                )}
+              >
+                Paste
+              </button>
+            </div>
           </div>
 
           {/* URL Input or Text Input */}
           {inputMode === 'url' ? (
-            <div className="relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                <LinkIcon size={18} />
-              </div>
+            <div className="relative mb-6">
+              <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
               <input
                 type="url"
                 value={jdUrl}
                 onChange={(e) => setJdUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
-                placeholder="Paste Job Description URL..."
-                className="w-full bg-[#161616] text-white font-['JetBrains_Mono'] pl-12 pr-24 py-4 rounded-xl border border-[#333] focus:border-[#CCFF00] focus:outline-none transition-colors placeholder:text-gray-600 text-sm"
+                placeholder="Paste job listing URL..."
+                className="w-full bg-black/50 border border-white/10 rounded-lg py-4 pl-12 pr-28 font-['JetBrains_Mono'] text-sm focus:ring-2 focus:ring-[#D4FF00]/40 focus:border-[#D4FF00] outline-none transition-all duration-200 placeholder:text-slate-600 text-white"
               />
               <button
                 onClick={handleUrlSubmit}
                 disabled={isScraping || !jdUrl.trim()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#CCFF00] hover:bg-[#b3e600] disabled:bg-[#333] disabled:text-gray-500 text-black font-['JetBrains_Mono'] text-xs px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-['JetBrains_Mono'] bg-[#D4FF00] text-black px-4 py-2 rounded-md font-bold hover:bg-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isScraping ? <Loader2 size={14} className="animate-spin" /> : <ExternalLink size={14} />}
-                {isScraping ? 'Fetching...' : 'Fetch'}
+                {isScraping ? '...' : 'FETCH'}
               </button>
             </div>
           ) : (
-            <div className="relative">
-              <div className="absolute left-4 top-4 text-gray-500">
-                <FileText size={18} />
-              </div>
+            <div className="relative mb-6">
               <textarea
                 value={jdText}
                 onChange={(e) => setJdText(e.target.value)}
-                placeholder="Paste Job Description text here..."
-                className="w-full h-32 bg-[#161616] text-white font-['JetBrains_Mono'] pl-12 pr-4 py-4 rounded-xl border border-[#333] focus:border-[#CCFF00] focus:outline-none transition-colors placeholder:text-gray-600 text-sm resize-none"
+                placeholder="Paste job description text here..."
+                className="w-full h-32 bg-black/50 border border-white/10 rounded-lg py-4 px-4 font-['JetBrains_Mono'] text-sm focus:ring-2 focus:ring-[#D4FF00]/40 focus:border-[#D4FF00] outline-none transition-all duration-200 placeholder:text-slate-600 text-white resize-none"
               />
             </div>
           )}
 
           {/* Scraped Status */}
           {isScraped && jdText && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-[#0a2a0a] border border-green-800 rounded-lg">
-              <CheckCircle2 size={16} className="text-green-500" />
-              <span className="font-['JetBrains_Mono'] text-xs text-green-400">
-                Job description loaded ({jdText.length} characters)
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-[#D4FF00]/10 border border-[#D4FF00]/30 rounded-lg mb-6">
+              <CheckCircle2 size={14} className="text-[#D4FF00]" />
+              <span className="font-['JetBrains_Mono'] text-xs text-[#D4FF00]">
+                Loaded ({jdText.length} chars)
               </span>
             </div>
           )}
 
-          <div className="flex items-center justify-center gap-4">
-            <div className="h-[1px] flex-1 bg-[#333]"></div>
-            <span className="font-['JetBrains_Mono'] text-xs text-gray-600 uppercase">Upload Resume PDF</span>
-            <div className="h-[1px] flex-1 bg-[#333]"></div>
-          </div>
-
-          <div
-            className="border-2 border-dashed border-[#333] hover:border-[#CCFF00] rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer transition-all"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="application/pdf"
-              className="hidden"
-            />
-            <Upload size={24} className="text-[#CCFF00] mb-2" />
-            <p className="text-gray-400 font-['JetBrains_Mono'] text-sm">
-              {resumeFile ? resumeFile.name : 'Click to upload PDF resume'}
-            </p>
+          {/* Step 2: Resume Upload */}
+          <div className="mb-6">
+            <label className="block font-['JetBrains_Mono'] text-xs uppercase tracking-wider text-slate-500 mb-2">
+              Step 2: Your Resume
+            </label>
+            <div
+              className="relative py-8 border border-dashed border-white/15 hover:border-[#D4FF00]/40 rounded-lg transition-all duration-200 cursor-pointer group bg-black/40"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="application/pdf"
+                className="hidden"
+              />
+              <div className="flex flex-col items-center">
+                <Upload size={28} className="text-[#D4FF00] mb-2 group-hover:scale-105 transition-transform duration-200" />
+                <p className="font-['JetBrains_Mono'] text-xs text-slate-400">
+                  {resumeFile ? resumeFile.name : 'Upload PDF Resume'}
+                </p>
+              </div>
+            </div>
+            {resumeFile && (
+              <div className="flex items-center gap-2 mt-2 text-[#D4FF00]">
+                <CheckCircle2 size={12} />
+                <span className="font-['JetBrains_Mono'] text-xs">Resume uploaded</span>
+              </div>
+            )}
           </div>
 
           {/* Status indicator */}
           {(jdText || jdUrl) && resumeFile && (
-            <div className="flex items-center justify-center gap-2 py-3 bg-[#0a0a0a] rounded-xl border border-[#222]">
-              <CheckCircle2 size={18} className="text-[#CCFF00]" />
-              <span className="font-['JetBrains_Mono'] text-sm text-gray-300">
-                Ready to use services below
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 flex items-center justify-center gap-2 py-3 bg-[#D4FF00]/10 border border-[#D4FF00]/30 rounded-lg"
+            >
+              <CheckCircle2 size={16} className="text-[#D4FF00]" />
+              <span className="font-['JetBrains_Mono'] text-sm text-[#D4FF00]">
+                Ready — Select a service below
               </span>
-            </div>
+            </motion.div>
           )}
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 };
@@ -533,30 +590,222 @@ const ServiceCard = ({ service, index, onClick, isReady }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.4 + (index * 0.05) }}
+    transition={{ delay: 0.05 + (index * 0.03), duration: 0.3 }}
     onClick={onClick}
     className={cn(
-      "group bg-[#0f0f0f] border p-6 rounded-xl cursor-pointer transition-all duration-300 relative overflow-hidden flex flex-col min-h-[220px]",
+      "group bg-[#0D0D0D]/80 border border-white/5 rounded-xl p-6 md:p-8 min-h-[220px] transition-all duration-300 cursor-pointer flex flex-col justify-between backdrop-blur-sm",
       isReady
-        ? "border-[#222] hover:border-[#CCFF00] hover:bg-[#141414]"
-        : "border-[#1a1a1a] opacity-60 cursor-not-allowed"
+        ? "hover:-translate-y-1 hover:border-[#D4FF00]/50 hover:shadow-[0_8px_30px_rgba(212,255,0,0.08)]"
+        : "opacity-50 cursor-not-allowed"
     )}
   >
-    <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center mb-4 text-white group-hover:text-[#CCFF00] transition-colors">
-      <service.icon size={20} strokeWidth={1.5} />
+    <div>
+      <div className="flex items-start justify-between mb-4">
+        <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:bg-[#D4FF00] group-hover:text-black transition-all duration-300 text-slate-400">
+          <service.icon size={22} strokeWidth={1.5} />
+        </div>
+        {isReady && (
+          <ArrowRight size={16} className="text-slate-600 group-hover:text-[#D4FF00] transition-colors duration-300 mt-3" />
+        )}
+      </div>
+      <h3 className="text-lg md:text-xl font-semibold text-white mb-2 tracking-tight font-['Inter']">{service.title}</h3>
+      <p className="text-sm text-slate-500 font-['JetBrains_Mono'] leading-relaxed line-clamp-2">{service.desc}</p>
     </div>
-
-    <h3 className="font-['Syne'] font-bold text-white text-lg mb-2 leading-tight">{service.title}</h3>
-    <p className="font-['JetBrains_Mono'] text-xs text-gray-500 leading-relaxed flex-grow">
-      {service.desc}
-    </p>
-
     {isReady && (
-      <div className="mt-4 flex items-center gap-2 text-[#CCFF00] opacity-0 group-hover:opacity-100 transition-opacity">
-        <ArrowRight size={14} />
+      <div className="mt-4 pt-4 border-t border-white/5">
+        <span className="text-[#D4FF00] font-['JetBrains_Mono'] text-xs tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {service.actionText}
+        </span>
       </div>
     )}
   </motion.div>
+);
+
+// ===== SERVICES SECTION =====
+
+const ServicesSection = ({ services, onServiceClick, isReady }) => (
+  <section className="py-16 md:py-20 bg-black relative" id="features">
+    <div className="max-w-[1280px] mx-auto px-6 md:px-8 lg:px-12">
+      {/* Section Header */}
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-2 h-2 bg-[#D4FF00] rounded-full"></div>
+          <span className="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-slate-500">
+            Available Services
+          </span>
+        </div>
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-tight font-['Inter']">
+          AI-Powered Analysis Tools
+        </h2>
+        <p className="font-['JetBrains_Mono'] text-sm text-slate-500 mt-2 max-w-md">
+          Select a tool to analyze your resume and job description
+        </p>
+      </div>
+
+      {/* Service Cards Grid - 4 columns with 32-40px gap */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+        {services.map((service, index) => (
+          <ServiceCard
+            key={service.id}
+            service={service}
+            index={index}
+            onClick={() => onServiceClick(service)}
+            isReady={isReady}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// ===== HOW IT WORKS SECTION =====
+
+const HowItWorksSection = () => (
+  <section className="py-16 md:py-20 border-t border-white/5 bg-[#050505]" id="how-it-works">
+    <div className="max-w-[1280px] mx-auto px-6 md:px-8 lg:px-12 flex flex-col lg:flex-row items-center gap-10 md:gap-16">
+      <div className="w-full lg:w-1/2">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-2 h-2 bg-[#D4FF00] rounded-full"></div>
+          <span className="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-slate-500">
+            How It Works
+          </span>
+        </div>
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight font-['Inter']">
+          Beat the <span className="text-[#D4FF00]">Algorithm</span>
+        </h2>
+        <p className="text-base text-slate-400 mb-8 max-w-md leading-relaxed">
+          Modern recruitment is automated. Our platform gives you the same tools corporations use to optimize your profile for maximum algorithmic visibility.
+        </p>
+        <ul className="space-y-4 font-['JetBrains_Mono'] text-sm text-slate-300">
+          <li className="flex items-center gap-3">
+            <CheckCircle2 className="text-[#D4FF00] flex-shrink-0" size={18} />
+            <span>Semantic keyword mapping</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <CheckCircle2 className="text-[#D4FF00] flex-shrink-0" size={18} />
+            <span>Multi-format structure verification</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <CheckCircle2 className="text-[#D4FF00] flex-shrink-0" size={18} />
+            <span>Contextual influence analysis</span>
+          </li>
+        </ul>
+      </div>
+      <div className="w-full lg:w-1/2 relative">
+        <div className="bg-[#0D0D0D] rounded-xl p-6 md:p-8 border border-white/10 shadow-[0_0_60px_rgba(212,255,0,0.03)]">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 rounded-full bg-red-500/30"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500/30"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500/30"></div>
+            </div>
+            <div className="text-[10px] font-['JetBrains_Mono'] text-slate-600 uppercase tracking-wider">Analysis Running...</div>
+          </div>
+          <div className="space-y-4">
+            <div className="h-4 bg-[#D4FF00]/10 rounded-full overflow-hidden border border-[#D4FF00]/20">
+              <motion.div
+                className="h-full bg-[#D4FF00] rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: '87.4%' }}
+                transition={{ duration: 2, ease: "easeOut" }}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-black/50 rounded-lg p-4 border border-white/5">
+                <p className="text-[10px] font-['JetBrains_Mono'] mb-1 text-slate-500 uppercase">Match</p>
+                <p className="text-2xl md:text-3xl font-bold text-[#D4FF00]">87.4%</p>
+              </div>
+              <div className="bg-black/50 rounded-lg p-4 border border-white/5">
+                <p className="text-[10px] font-['JetBrains_Mono'] mb-1 text-slate-500 uppercase">Risk</p>
+                <p className="text-2xl md:text-3xl font-bold text-white">LOW</p>
+              </div>
+            </div>
+            <div className="bg-black/50 rounded-lg p-4 font-['JetBrains_Mono'] text-[11px] leading-relaxed text-slate-500 border border-white/5 h-32 overflow-y-auto">
+              <span className="text-[#D4FF00]">&gt; INITIALIZED</span><br />
+              &gt; [CRITICAL] Missing: "Distributed Systems"<br />
+              &gt; [SUGGEST] Upgrade "Leadership"<br />
+              &gt; [OK] Format verified<br />
+              &gt; [INFO] 1,204 profiles analyzed
+            </div>
+          </div>
+        </div>
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#D4FF00]/10 blur-[100px] -z-10"></div>
+      </div>
+    </div>
+  </section>
+);
+
+// ===== CTA SECTION =====
+
+const CTASection = ({ onScrollToTop }) => (
+  <section className="py-16 md:py-20 bg-[#0D0D0D] border-y border-white/5">
+    <div className="max-w-[1280px] mx-auto px-6 md:px-8 lg:px-12 text-center">
+      <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-3 tracking-tight font-['Inter']">
+        Ready to Optimize Your Career?
+      </h2>
+      <p className="text-sm text-slate-400 font-['JetBrains_Mono'] mb-8 max-w-md mx-auto">
+        Join professionals who have accelerated their trajectory with AI-powered optimization.
+      </p>
+      <div className="flex flex-col sm:flex-row justify-center gap-3">
+        <button
+          onClick={onScrollToTop}
+          className="px-6 py-3 bg-[#D4FF00] text-black font-bold text-sm uppercase tracking-wider rounded-lg hover:bg-white transition-all duration-200"
+        >
+          Start Analysis
+        </button>
+        <button className="px-6 py-3 border border-white/20 text-white font-bold text-sm uppercase tracking-wider rounded-lg hover:border-[#D4FF00] hover:text-[#D4FF00] transition-all duration-200">
+          Learn More
+        </button>
+      </div>
+    </div>
+  </section>
+);
+
+// ===== FOOTER =====
+
+const Footer = () => (
+  <footer className="bg-black py-12 md:py-16 border-t border-white/5">
+    <div className="max-w-[1280px] mx-auto px-6 md:px-8 lg:px-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+        <div>
+          <div className="font-['JetBrains_Mono'] font-bold text-xl tracking-tight text-white mb-4">
+            APP<span className="text-[#D4FF00]">LICATION</span>
+          </div>
+          <p className="text-slate-500 text-sm max-w-xs leading-relaxed font-['JetBrains_Mono']">
+            AI-powered career optimization through algorithmic precision.
+          </p>
+        </div>
+        <div>
+          <h4 className="font-['JetBrains_Mono'] text-xs font-bold text-white mb-4 uppercase tracking-wider">Services</h4>
+          <ul className="space-y-2 text-sm text-slate-500 font-['JetBrains_Mono']">
+            <li><a className="hover:text-[#D4FF00] transition-colors" href="#">ATS Scanner</a></li>
+            <li><a className="hover:text-[#D4FF00] transition-colors" href="#">Job Match</a></li>
+            <li><a className="hover:text-[#D4FF00] transition-colors" href="#">CV Builder</a></li>
+            <li><a className="hover:text-[#D4FF00] transition-colors" href="#">Interview Prep</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-['JetBrains_Mono'] text-xs font-bold text-white mb-4 uppercase tracking-wider">Newsletter</h4>
+          <p className="text-slate-500 mb-4 font-['JetBrains_Mono'] text-xs">Get updates on market trends.</p>
+          <div className="relative flex">
+            <input className="flex-1 bg-white/5 border border-white/10 rounded-l-lg py-3 px-4 text-sm focus:ring-1 focus:ring-[#D4FF00] outline-none text-white font-['JetBrains_Mono'] placeholder:text-slate-600" placeholder="Email" type="email" />
+            <button className="px-4 bg-[#D4FF00] text-black font-bold text-sm rounded-r-lg hover:bg-white transition-all">
+              <Send size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row items-center justify-between border-t border-white/5 pt-8 gap-4">
+        <p className="font-['JetBrains_Mono'] text-xs text-slate-600 text-center md:text-left">
+          © 2024 Application. All rights reserved.
+        </p>
+        <div className="flex gap-6 font-['JetBrains_Mono'] text-xs text-slate-600">
+          <a className="hover:text-white transition-colors" href="#">Privacy</a>
+          <a className="hover:text-white transition-colors" href="#">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 );
 
 // ===== SERVICE DETAIL PAGE COMPONENT =====
@@ -577,11 +826,42 @@ const ServiceDetailPage = ({ service, onBack, jdText, resumeText, resumeFile }) 
     setResult(null);
 
     try {
-      // First, if we have a resume file, we need to extract text from it
+      // LinkedIn People - Get search data and open LinkedIn
+      if (service.id === 'linkedin-people') {
+        const response = await fetch(`${BACKEND_URL}${service.endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jd: jdText })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          setError(data.error);
+        } else {
+          // Use the first simple search string
+          const searchQuery = data.simple_searches?.[0] || `${data.company_name} Recruiter`;
+
+          // Open LinkedIn with simple search
+          const linkedinUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(searchQuery)}`;
+          window.open(linkedinUrl, '_blank');
+
+          // Store result for display
+          setResult({
+            ...data,
+            search_query: searchQuery,
+            linkedin_url: linkedinUrl,
+            message: 'LinkedIn search opened in new tab. Search for HR professionals and recruiters.'
+          });
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // For other services - standard flow
       let extractedResumeText = resumeText;
 
       if (resumeFile && !resumeText) {
-        // For services that need resume text, we use the comprehensive endpoint to extract it
         const formData = new FormData();
         formData.append('jd', jdText);
         formData.append('resume_file', resumeFile);
@@ -597,7 +877,6 @@ const ServiceDetailPage = ({ service, onBack, jdText, resumeText, resumeFile }) 
         }
       }
 
-      // Now call the specific service endpoint
       const response = await fetch(`${BACKEND_URL}${service.endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -627,88 +906,83 @@ const ServiceDetailPage = ({ service, onBack, jdText, resumeText, resumeFile }) 
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="min-h-screen pt-24 pb-12 px-4 md:px-8"
+      className="min-h-screen pt-24 pb-12 px-4 md:px-8 bg-[#050505]"
     >
-      {/* Back Button - More Prominent */}
       <button
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
           onBack();
         }}
-        className="flex items-center gap-2 bg-[#1a1a1a] hover:bg-[#252525] text-[#CCFF00] px-4 py-3 rounded-lg transition-all mb-8 font-['JetBrains_Mono'] text-sm uppercase tracking-wider border border-[#333] hover:border-[#CCFF00] relative z-50 cursor-pointer pointer-events-auto"
-        style={{ position: 'relative', zIndex: 100 }}
+        className="flex items-center gap-2 bg-[#0D0D0D] hover:bg-[#1a1a1a] text-[#D4FF00] px-4 py-3 transition-all mb-8 font-['JetBrains_Mono'] text-sm uppercase tracking-wider border border-white/10 hover:border-[#D4FF00]"
       >
         <ChevronLeft size={20} />
         Back to Dashboard
       </button>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Column - Service Info */}
         <div>
-          {/* Service Icon */}
-          <div className="w-16 h-16 rounded-xl bg-[#1a1a1a] border border-[#333] flex items-center justify-center text-[#CCFF00] mb-6">
+          <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6 text-[#D4FF00]">
             <service.icon size={32} strokeWidth={1.5} />
           </div>
 
-          {/* Service Title */}
-          <h1 className="font-['Syne'] text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="font-['Inter'] text-4xl md:text-5xl font-black text-white mb-4 uppercase">
             {service.title}
           </h1>
 
-          {/* Description with accent bar */}
           <div className="flex gap-4 mb-6">
-            <div className="w-1 bg-[#CCFF00] rounded-full"></div>
-            <p className="font-['JetBrains_Mono'] text-sm text-gray-400">
+            <div className="w-1 bg-[#D4FF00]"></div>
+            <p className="font-['JetBrains_Mono'] text-sm text-slate-400">
               {service.desc}
             </p>
           </div>
 
-          {/* Full Description */}
-          <p className="font-['JetBrains_Mono'] text-sm text-gray-500 mb-8 leading-relaxed">
+          <p className="font-['JetBrains_Mono'] text-sm text-slate-500 mb-8 leading-relaxed">
             {service.fullDesc}
           </p>
 
-          {/* Launch Button */}
           <button
             onClick={handleLaunchTool}
             disabled={isLoading || !jdText}
-            className="bg-transparent border-2 border-[#CCFF00] text-[#CCFF00] hover:bg-[#CCFF00] hover:text-black disabled:border-gray-600 disabled:text-gray-600 disabled:cursor-not-allowed font-['JetBrains_Mono'] text-sm px-8 py-4 rounded-full transition-all flex items-center gap-3"
+            className="bg-[#D4FF00] text-black hover:bg-white disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed font-['JetBrains_Mono'] font-bold text-sm px-8 py-4 transition-all flex items-center gap-3 uppercase tracking-widest"
           >
             {isLoading ? (
               <>
                 <Loader2 size={18} className="animate-spin" />
-                Processing...
+                {service.id === 'linkedin-people' ? 'Generating Search...' : 'Processing...'}
               </>
             ) : (
               <>
-                LAUNCH TOOL
+                {service.id === 'linkedin-people' ? (
+                  <>
+                    <Users size={18} />
+                    MAP NETWORK
+                  </>
+                ) : (
+                  service.actionText || 'LAUNCH TOOL'
+                )}
               </>
             )}
           </button>
 
-          {/* Error Display */}
           {error && (
-            <div className="mt-4 p-4 bg-red-500/10 border border-red-500 rounded-lg">
+            <div className="mt-4 p-4 bg-red-500/10 border border-red-500">
               <p className="font-['JetBrains_Mono'] text-sm text-red-400">{error}</p>
             </div>
           )}
         </div>
 
-        {/* Right Column - Results Panel */}
-        <div className="bg-[#0a0a0a] border border-[#222] rounded-2xl p-8 min-h-[400px] flex flex-col">
+        <div className="bg-[#0a0a0a] border border-white/10 p-8 min-h-[400px] flex flex-col">
           {!result && !isLoading && (
             <div className="flex-1 flex flex-col items-center justify-center text-center">
-              {/* Animated Icon Container */}
               <div className="relative mb-6">
-                <div className="w-20 h-20 rounded-full border border-[#333] flex items-center justify-center">
-                  <service.icon size={32} className="text-[#CCFF00]" />
+                <div className="w-20 h-20 border border-white/10 flex items-center justify-center">
+                  <service.icon size={32} className="text-[#D4FF00]" />
                 </div>
-                {/* Animated rings */}
-                <div className="absolute inset-0 rounded-full border border-[#CCFF00]/20 animate-ping" style={{ animationDuration: '2s' }}></div>
+                <div className="absolute inset-0 border border-[#D4FF00]/20 animate-ping" style={{ animationDuration: '2s' }}></div>
               </div>
-              <h3 className="font-['Syne'] text-xl text-white mb-2">Module Ready</h3>
-              <p className="font-['JetBrains_Mono'] text-xs text-gray-500">Awaiting Input Data</p>
+              <h3 className="font-['Inter'] text-xl text-white mb-2 uppercase">Module Ready</h3>
+              <p className="font-['JetBrains_Mono'] text-xs text-slate-500">Awaiting Input Data</p>
             </div>
           )}
 
@@ -733,7 +1007,6 @@ const ResultDisplay = ({ result, serviceId }) => {
   const [visibleSections, setVisibleSections] = useState(0);
 
   useEffect(() => {
-    // Progressive reveal animation
     const sectionCount = Object.keys(result).length;
     let current = 0;
     const interval = setInterval(() => {
@@ -756,20 +1029,20 @@ const ResultDisplay = ({ result, serviceId }) => {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="flex items-start gap-2 text-sm text-gray-300 font-['JetBrains_Mono'] bg-[#111] p-3 rounded-lg border border-[#222]"
+              className="flex items-start gap-2 text-sm text-slate-300 font-['JetBrains_Mono'] bg-black p-3 border border-white/5"
             >
               {typeof item === 'object' ? (
                 <div className="w-full">
                   {Object.entries(item).map(([k, v]) => (
                     <div key={k} className="mb-1">
-                      <span className="text-[#CCFF00] text-xs uppercase">{k}: </span>
-                      <span className="text-gray-300">{String(v)}</span>
+                      <span className="text-[#D4FF00] text-xs uppercase">{k}: </span>
+                      <span className="text-slate-300">{String(v)}</span>
                     </div>
                   ))}
                 </div>
               ) : (
                 <>
-                  <span className="text-[#CCFF00] mt-1">•</span>
+                  <span className="text-[#D4FF00] mt-1">•</span>
                   <span>{String(item)}</span>
                 </>
               )}
@@ -781,22 +1054,22 @@ const ResultDisplay = ({ result, serviceId }) => {
       return (
         <div className="space-y-2">
           {Object.entries(value).map(([k, v]) => (
-            <div key={k} className="bg-[#111] p-3 rounded-lg border border-[#222]">
-              <span className="text-[#CCFF00] text-xs uppercase font-['JetBrains_Mono']">{k}</span>
-              <p className="text-gray-300 text-sm font-['JetBrains_Mono'] mt-1 whitespace-pre-wrap">{String(v)}</p>
+            <div key={k} className="bg-black p-3 border border-white/5">
+              <span className="text-[#D4FF00] text-xs uppercase font-['JetBrains_Mono']">{k}</span>
+              <p className="text-slate-300 text-sm font-['JetBrains_Mono'] mt-1 whitespace-pre-wrap">{String(v)}</p>
             </div>
           ))}
         </div>
       );
     } else if (typeof value === 'number') {
       return (
-        <div className="text-4xl font-['Syne'] font-bold text-[#CCFF00]">
+        <div className="text-4xl font-['Inter'] font-black text-[#D4FF00]">
           {value}{key.includes('score') || key.includes('probability') || key.includes('match') ? '%' : ''}
         </div>
       );
     } else {
       return (
-        <p className="text-gray-300 text-sm font-['JetBrains_Mono'] whitespace-pre-wrap">{String(value)}</p>
+        <p className="text-slate-300 text-sm font-['JetBrains_Mono'] whitespace-pre-wrap">{String(value)}</p>
       );
     }
   };
@@ -816,14 +1089,160 @@ const ResultDisplay = ({ result, serviceId }) => {
           animate={{ opacity: idx < visibleSections ? 1 : 0, y: idx < visibleSections ? 0 : 20 }}
           transition={{ duration: 0.3 }}
         >
-          <h3 className="font-['Syne'] text-lg text-white mb-3 flex items-center gap-2">
-            <Sparkles size={16} className="text-[#CCFF00]" />
+          <h3 className="font-['Inter'] text-lg text-white mb-3 flex items-center gap-2 uppercase">
+            <Sparkles size={16} className="text-[#D4FF00]" />
             {formatKey(key)}
           </h3>
           {renderValue(key, value)}
         </motion.div>
       ))}
     </div>
+  );
+};
+
+// ===== LOGIN MODAL COMPONENT =====
+
+const LoginModal = ({ isOpen, onClose, onSuccess }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.message.replace('Firebase: ', '').replace(/\(auth\/.*\)/, ''));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          onClick={(e) => e.stopPropagation()}
+          className="bg-[#0D0D0D] border border-white/10 p-8 md:p-12 w-full max-w-md relative"
+        >
+          {/* Corner accents */}
+          <div className="absolute -top-1 -left-1 w-3 h-3 bg-[#D4FF00]"></div>
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#D4FF00]"></div>
+          <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-[#D4FF00]"></div>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#D4FF00]"></div>
+
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"
+          >
+            <X size={24} />
+          </button>
+
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6 mx-auto">
+              <Shield size={32} className="text-[#D4FF00]" />
+            </div>
+            <h2 className="font-['Inter'] text-2xl font-black text-white uppercase tracking-tight">
+              {isSignUp ? 'Create Account' : 'Sign In'}
+            </h2>
+            <p className="font-['JetBrains_Mono'] text-xs text-slate-500 mt-2 uppercase tracking-widest">
+              {isSignUp ? 'JOIN THE SYSTEM' : 'AUTHENTICATION REQUIRED'}
+            </p>
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30">
+              <p className="font-['JetBrains_Mono'] text-xs text-red-400">{error}</p>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block font-['JetBrains_Mono'] text-xs text-slate-500 uppercase tracking-widest mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full bg-black/40 border border-white/10 py-4 px-4 font-['JetBrains_Mono'] text-sm focus:ring-1 focus:ring-[#D4FF00] focus:border-[#D4FF00] outline-none transition-all text-white placeholder:text-slate-700"
+                placeholder="user@example.com"
+              />
+            </div>
+            <div>
+              <label className="block font-['JetBrains_Mono'] text-xs text-slate-500 uppercase tracking-widest mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full bg-black/40 border border-white/10 py-4 px-4 font-['JetBrains_Mono'] text-sm focus:ring-1 focus:ring-[#D4FF00] focus:border-[#D4FF00] outline-none transition-all text-white placeholder:text-slate-700"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-[#D4FF00] text-black hover:bg-white disabled:bg-slate-700 disabled:text-slate-500 font-['JetBrains_Mono'] font-bold text-sm py-4 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                </>
+              ) : (
+                isSignUp ? 'Create Account' : 'Sign In'
+              )}
+            </button>
+          </form>
+
+          {/* Toggle sign up / sign in */}
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+              }}
+              className="font-['JetBrains_Mono'] text-xs text-slate-500 hover:text-[#D4FF00] transition-colors"
+            >
+              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
@@ -842,8 +1261,10 @@ export default function App() {
   const [isScraped, setIsScraped] = useState(false);
 
   // Navigation state
-  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'dashboard' | 'service'
+  const [currentView, setCurrentView] = useState('landing');
   const [selectedService, setSelectedService] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingService, setPendingService] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -892,12 +1313,30 @@ export default function App() {
       alert('Please enter a job description URL or paste the text first.');
       return;
     }
-    if (!resumeFile) {
+
+    if (service.id !== 'linkedin-people' && !resumeFile) {
       alert('Please upload your resume PDF first.');
       return;
     }
+
+    // Check if user is authenticated
+    if (!user) {
+      setPendingService(service);
+      setShowLoginModal(true);
+      return;
+    }
+
     setSelectedService(service);
     setCurrentView('service');
+  };
+
+  const handleLoginSuccess = () => {
+    // If there was a pending service, navigate to it
+    if (pendingService) {
+      setSelectedService(pendingService);
+      setCurrentView('service');
+      setPendingService(null);
+    }
   };
 
   const handleBackToDashboard = () => {
@@ -914,28 +1353,25 @@ export default function App() {
     setCurrentView('dashboard');
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const isReady = (jdText || (jdUrl && isScraped)) && resumeFile;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white relative overflow-x-hidden selection:bg-[#CCFF00] selection:text-black">
+    <div className="min-h-screen bg-[#050505] text-slate-300 font-['Inter'] transition-colors duration-300 overflow-x-hidden selection:bg-[#D4FF00] selection:text-black">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600;800;900&display=swap');
       `}</style>
-
-      {currentView !== 'landing' && (
-        <>
-          <NoiseBackground />
-          <GridOverlay />
-        </>
-      )}
 
       <AnimatePresence mode="wait">
         {currentView === 'landing' ? (
@@ -948,7 +1384,6 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="pt-32 pb-20 px-4 relative z-10 w-full flex flex-col items-center"
             >
               <InputZone
                 jdUrl={jdUrl}
@@ -963,33 +1398,15 @@ export default function App() {
                 isScraping={isScraping}
                 isScraped={isScraped}
               />
-
-              <div id="services" className="w-full max-w-6xl px-4">
-                <div className="flex items-center gap-4 mb-8">
-                  <h2 className="font-['Syne'] text-2xl font-bold text-white">AVAILABLE MODULES</h2>
-                  <div className="h-[1px] flex-1 bg-[#222]"></div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {SERVICES.map((service, idx) => (
-                    <ServiceCard
-                      key={service.id}
-                      service={service}
-                      index={idx}
-                      onClick={() => handleServiceClick(service)}
-                      isReady={isReady}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <footer className="w-full max-w-6xl mt-32 pt-8 border-t border-[#222] flex flex-col md:flex-row justify-between items-center text-gray-600 font-['JetBrains_Mono'] text-xs gap-4 md:gap-0 px-4">
-                <p>&copy; 2025 JOB.OPT SYSTEM</p>
-                <div className="flex gap-6">
-                  <a href="#" className="hover:text-white transition-colors">PRIVACY</a>
-                  <a href="#" className="hover:text-white transition-colors">TERMS</a>
-                  <a href="#" className="hover:text-white transition-colors">CONTACT</a>
-                </div>
-              </footer>
+              <ScrollingMarquee />
+              <ServicesSection
+                services={SERVICES}
+                onServiceClick={handleServiceClick}
+                isReady={isReady || jdText}
+              />
+              <HowItWorksSection />
+              <CTASection onScrollToTop={scrollToTop} />
+              <Footer />
             </motion.main>
           </>
         ) : (
@@ -1006,6 +1423,16 @@ export default function App() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => {
+          setShowLoginModal(false);
+          setPendingService(null);
+        }}
+        onSuccess={handleLoginSuccess}
+      />
     </div>
   );
 }
