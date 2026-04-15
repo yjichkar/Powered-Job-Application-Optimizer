@@ -1,0 +1,43 @@
+{
+  "ats_scanner": {
+    "ATS Score": 65,
+    "Key Strengths": ["Domain expertise in Financial Markets & Reference Data", "Certifications in Oracle Analytics Cloud and Microsoft Fabric"],
+    "Improvements": ["Include more details on technical skills like SQL, Python", "Add specific achievements or metrics in previous roles", "Expand on stakeholder management and collaboration experience"]
+  },
+  "job_match": {
+    "Match Percentage": 60,
+    "Matching Skills": ["Business Requirements (BRD/FRD)", "Stakeholder Management", "Traceability Matrix", "Domain Knowledge in Financial Markets"],
+    "Missing Skills": ["Gathering and documenting technical requirements", "Experience with cutting-edge technology", "Collaboration with engineers and business stakeholders"],
+    "Profile Summary": "Yashwant has relevant domain knowledge and certifications but lacks specific technical skills and experience with cutting-edge technology."
+  },
+  "skill_gap": {
+    "Missing Skills": ["Technical requirement gathering", "Cutting-edge technology experience", "Collaboration with engineers", "Detailed analytical skills"],
+    "Learning Suggestions": ["Take a course on Business Analysis tools like JIRA or Confluence", "Work on a project involving collaboration with engineers and stakeholders"]
+  },
+  "interview_prep": {
+    "Questions": [
+      "1. Can you describe a time when you gathered and documented technical requirements?",
+      "2. How do you ensure traceability in your business analysis process?",
+      "3. Describe a complex technical problem you solved using analytical skills.",
+      "4. How do you manage stakeholders with conflicting requirements?",
+      "5. What cutting-edge technologies have you worked with in your previous roles?"
+    ]
+  },
+  "cold_email": {
+    "Subject": "Experienced Business Analyst with Financial Markets Expertise",
+    "Email": "Dear Hiring Manager, I am Yashwant Jichkar, a Business Analyst with expertise in Financial Markets and Reference Data. I hold certifications in Oracle Analytics Cloud and Microsoft Fabric, and I have experience in business requirements documentation and stakeholder management. I am eager to bring my analytical skills and domain knowledge to Barclays to help drive innovation in your digital landscape. I would love the opportunity to discuss how my background aligns with your needs. Best regards, Yashwant Jichkar"
+  },
+  "cv_builder": {
+    "Resume Points": [
+      "Documented business requirements (BRD/FRD) for financial market projects, ensuring alignment with stakeholder needs",
+      "Managed traceability matrix to track project deliverables and ensure compliance with business objectives",
+      "Collaborated with stakeholders to analyze exceptions and implement process improvements",
+      "Utilized domain knowledge in ISIN/SEDOL/CUSIP to enhance instrument master data accuracy"
+    ]
+  },
+  "response_rate": {
+    "Response Probability": 60,
+    "Reasons": ["Relevant domain knowledge", "Certifications in analytics"],
+    "Tips": ["Tailor your resume to highlight specific technical skills", "Follow up with a personalized LinkedIn message to the hiring manager"]
+  }
+}
