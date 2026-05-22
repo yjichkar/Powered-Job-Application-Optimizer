@@ -72,6 +72,7 @@ Pandas	Data Handling
 Regex	Text Cleaning
 Git & GitHub	Version Control
 🧩 System Workflow
+
 User Uploads Resume + Job Description
                 ↓
         Input Processing
@@ -85,6 +86,7 @@ User Uploads Resume + Job Description
    Resume Optimization & Email Generation
                 ↓
        ATS-Friendly Final Output
+       
 📂 Project Structure
 AI-Job-Optimizer/
 │
