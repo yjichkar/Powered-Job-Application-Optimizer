@@ -87,7 +87,9 @@ User Uploads Resume + Job Description
                 ↓
        ATS-Friendly Final Output
        
-📂 Project Structure
+# 📂 Project Structure
+
+```bash
 AI-Job-Optimizer/
 │
 ├── app.py
@@ -111,20 +113,43 @@ AI-Job-Optimizer/
 │
 └── data/
     └── sample_job_descriptions/
-⚙️ Installation
-1️⃣ Clone the Repository
+```
+
+---
+
+# ⚙️ Installation
+
+## 1️⃣ Clone the Repository
+
+```bash
 git clone https://github.com/your-username/AI-Job-Optimizer.git
-2️⃣ Navigate to Project Directory
+```
+
+## 2️⃣ Navigate to Project Directory
+
+```bash
 cd AI-Job-Optimizer
-3️⃣ Install Dependencies
+```
+
+## 3️⃣ Install Dependencies
+
+```bash
 pip install -r requirements.txt
-4️⃣ Configure API Key
+```
 
-Create a .env file:
+## 4️⃣ Configure API Key
 
+Create a `.env` file:
+
+```env
 OPENAI_API_KEY=your_api_key_here
-5️⃣ Run the Application
+```
+
+## 5️⃣ Run the Application
+
+```bash
 streamlit run app.py
+```
 🧪 How the System Works
 Step 1: User Input
 
